@@ -4,11 +4,27 @@ import {KeyStore} from "./keystore";
 import type {Http2ServerRequest, Http2ServerResponse} from "http2";
 
 const cache: { [key:string]: RegExp } = {} as any;
-
+type SignIdentifier = string | ((name: string) => string)
 export type CookiesOptions = {
+
+  /**
+   * KeyStore to be used for signing and encrypting
+   */
   keyStore?: KeyStore;
+  /**
+   * a boolean indicating whether the cookie is to be signed (`false` by default). If this is true, another cookie of the same name with the `signIdentifier` will also be sent, with a 27-byte url-safe base64 SHA1 value representing the hash of _cookie-name_=_cookie-value_ against the first [KeyStore](keystore) key. This signature key is used to detect tampering the next time a cookie is received.
+   * @default false
+   */
   signed?: boolean;
+  /**
+   * Encrypt cookies by default and assume received cookies are encrypted.
+   * @default false
+   */
   encrypted?: boolean;
+  /**
+   * Mark cookies as secure by default.
+   * @default `req.protocol`
+   */
   secure?: boolean | undefined;
   /**
    * If string, provided value will be appended cookie name with dot. For example with given value `mysig`
@@ -16,34 +32,23 @@ export type CookiesOptions = {
    *
    * @default `sig`
    */
-  signIdentifier?: string | ((name: string) => string)
+  signIdentifier?: SignIdentifier
 }
 
 export type SetCookies = CookiesOptions & CookieAttrs
 export type GetCookies = CookiesOptions
 
 export class Cookies {
-  /**
-   * Mark cookies as secure by default.
-   * @default `req.protocol`
-   */
-  secure?: boolean | undefined;
 
-  /**
-   * Encrypt cookies by default and assume received cookies are encrypted.
-   * @default false
-   */
+  secure?: CookiesOptions["secure"];
+
   encrypted: boolean;
 
-  /**
-   * Sign cookies by default and assume received cookies are signed
-   * @default false
-   */
   signed: boolean;
 
   keyStore: KeyStore;
 
-  signIdentifier?: CookiesOptions['signIdentifier']
+  signIdentifier?: SignIdentifier
 
   readonly request: IncomingMessage | Http2ServerRequest;
   readonly response: ServerResponse | Http2ServerResponse;
@@ -59,6 +64,26 @@ export class Cookies {
     this.signIdentifier = options.signIdentifier || 'sig';
   }
 
+  /**
+   * This extracts the cookie with the given name from the Set-Cookie header in the request. If such a cookie exists, its value is returned. Otherwise, nothing is returned.
+   *
+   * `{ signed: true }` can optionally be passed as the second parameter options. In this case, a signature cookie (a cookie of same name ending with the .sig suffix appended) is fetched. If no such cookie exists, nothing is returned.
+   *
+   * If the signature cookie does exist, the provided KeyStore is used to check whether the hash of cookie-name=cookie-value matches that of any registered key/s:
+   *
+   * - If the signature cookie hash matches the first key, the original cookie value is returned.
+   * - If the signature cookie hash matches any other key, the original cookie value is returned AND an outbound header is set to update the signature cookie's value to the hash of the first key. This enables automatic freshening of signature cookies that have become stale due to key rotation.
+   * - If the signature cookie hash does not match any key, nothing is returned, and an outbound header with an expired date is used to delete the cookie.
+   *
+   * `{ encrypted: true }` can optionally be passed as the second parameter options. In this case, the provided KeyStore will try to decrypt the cookie value with registered key/s.
+   *
+   * - If the decryption fails nothing is returned, and the cookie stays intact.
+   * - If decryption succeeds, decrypted cookie value is returned.
+   *
+   * If both `signed` and `encrypted` options are provided, signature check will be applied with encrypted value. Than the decryption will be applied.
+   * @param name
+   * @param opts
+   */
   get(name: string, opts?: GetCookies) {
     const sigId = opts?.signIdentifier || this.signIdentifier;
 
@@ -101,6 +126,13 @@ export class Cookies {
     }
   }
 
+  /**
+   * This sets the given cookie in the response and returns the current context to allow chaining.
+   *
+   * @param name Cookie name
+   * @param value Cookie value. If this is omitted, an outbound header with an expired date is used to delete the cookie.
+   * @param opts Overridden options
+   */
   set(name: string, value: string | null, opts: SetCookies) {
     const res = this.response;
     const req = this.request;

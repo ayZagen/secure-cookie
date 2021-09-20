@@ -1,6 +1,6 @@
 /*!
  * secure-cookie v0.0.0
- * (c) [authorFullName]
+ * (c) Ismail H. Ayaz
  * Released under the MIT License.
  */
 
@@ -18,6 +18,7 @@ var compare__default = /*#__PURE__*/_interopDefaultLegacy(compare);
 var crypto__default = /*#__PURE__*/_interopDefaultLegacy(crypto);
 var http__default = /*#__PURE__*/_interopDefaultLegacy(http);
 
+// eslint-disable-next-line no-control-regex
 var fieldContentRegExp = /^[\u0009\u0020-\u007e\u0080-\u00ff]+$/;
 var SAME_SITE_REGEXP = /^(?:lax|none|strict)$/i;
 var Cookie = /** @class */ (function () {
@@ -100,86 +101,175 @@ OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 PERFORMANCE OF THIS SOFTWARE.
 ***************************************************************************** */
 
+var __assign = function() {
+    __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+
 function __spreadArray(to, from) {
     for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
         to[j] = from[i];
     return to;
 }
 
+var CIPHER_INFO = {
+    'aes-128-cbc': { ivLength: 16, keyLength: 16 },
+    'aes-128-cbc-hmac-sha1': { ivLength: 16, keyLength: 16 },
+    'aes-128-cbc-hmac-sha256': { ivLength: 16, keyLength: 16 },
+    'aes-128-cfb': { ivLength: 16, keyLength: 16 },
+    'aes-128-cfb1': { ivLength: 16, keyLength: 16 },
+    'aes-128-cfb8': { ivLength: 16, keyLength: 16 },
+    'aes-128-ctr': { ivLength: 16, keyLength: 16 },
+    'aes-128-ecb': { ivLength: undefined, keyLength: 16 },
+    'aes-128-ocb': { ivLength: 12, keyLength: 16 },
+    'aes-128-ofb': { ivLength: 16, keyLength: 16 },
+    'aes-128-xts': { ivLength: 16, keyLength: 32 },
+    'aes-192-cbc': { ivLength: 16, keyLength: 24 },
+    'aes-192-cfb': { ivLength: 16, keyLength: 24 },
+    'aes-192-cfb1': { ivLength: 16, keyLength: 24 },
+    'aes-192-cfb8': { ivLength: 16, keyLength: 24 },
+    'aes-192-ctr': { ivLength: 16, keyLength: 24 },
+    'aes-192-ecb': { ivLength: undefined, keyLength: 24 },
+    'aes-192-ocb': { ivLength: 12, keyLength: 24 },
+    'aes-192-ofb': { ivLength: 16, keyLength: 24 },
+    'aes-256-cbc': { ivLength: 16, keyLength: 32 },
+    'aes-256-cbc-hmac-sha1': { ivLength: 16, keyLength: 32 },
+    'aes-256-cbc-hmac-sha256': { ivLength: 16, keyLength: 32 },
+    'aes-256-cfb': { ivLength: 16, keyLength: 32 },
+    'aes-256-cfb1': { ivLength: 16, keyLength: 32 },
+    'aes-256-cfb8': { ivLength: 16, keyLength: 32 },
+    'aes-256-ctr': { ivLength: 16, keyLength: 32 },
+    'aes-256-ecb': { ivLength: undefined, keyLength: 32 },
+    'aes-256-ocb': { ivLength: 12, keyLength: 32 },
+    'aes-256-ofb': { ivLength: 16, keyLength: 32 },
+    'aes-256-xts': { ivLength: 16, keyLength: 64 },
+    'aes-128-ccm': { ivLength: 12, keyLength: 16 },
+    'aes-128-gcm': { ivLength: 12, keyLength: 16 },
+    'aes-192-ccm': { ivLength: 12, keyLength: 24 },
+    'aes-192-gcm': { ivLength: 12, keyLength: 24 },
+    'aes-256-ccm': { ivLength: 12, keyLength: 32 },
+    'aes-256-gcm': { ivLength: 12, keyLength: 32 },
+    'id-aes128-ccm': { ivLength: 12, keyLength: 16 },
+    'id-aes128-gcm': { ivLength: 12, keyLength: 16 },
+    'id-aes192-ccm': { ivLength: 12, keyLength: 24 },
+    'id-aes192-gcm': { ivLength: 12, keyLength: 24 },
+    'id-aes256-ccm': { ivLength: 12, keyLength: 32 },
+    'id-aes256-gcm': { ivLength: 12, keyLength: 32 },
+};
+
+var AUTH_TAG_REQUIRED = /-(gcm|ccm)/;
 var KeyStore = /** @class */ (function () {
     function KeyStore(opts) {
-        if (opts === void 0) { opts = {}; }
+        opts = opts || {};
         if (opts.encryption) {
-            if (!opts.encryption.keys || opts.encryption.keys.length === 0) {
+            if (!Array.isArray(opts.encryption.keys) || opts.encryption.keys.length === 0) {
                 throw new Error("keys are required for encryption");
             }
         }
         if (opts.signing) {
-            if (!opts.signing.keys || opts.signing.keys.length === 0) {
+            if (!Array.isArray(opts.signing.keys) || opts.signing.keys.length === 0) {
                 throw new Error("keys are required for signing");
             }
         }
         this.encryption = Object.assign({
-            ivLength: 64,
-            algorithm: 'aes-256-gcm',
-            ivSeparator: '|',
-            encoding: 'utf-8'
+            algorithm: 'aes-192-ccm',
+            authTagLength: 16,
+            encoding: 'hex', keys: []
         }, opts.encryption || {});
-        this.signing = Object.assign({ encoding: 'utf-8', algorithm: 'sha256' }, opts.signing || {});
+        this.signing = Object.assign({ encoding: 'base64', algorithm: 'sha1', keys: [] }, opts.signing || {});
     }
-    KeyStore.prototype.encrypt = function (data, key) {
-        var opts = this.encryption;
-        key = key || (opts === null || opts === void 0 ? void 0 : opts.keys[0]);
-        if (!key) {
-            throw new Error("no key found");
-        }
-        var iv = crypto__default['default'].randomBytes(opts.ivLength);
-        var cipher = crypto__default['default'].createCipheriv(opts.algorithm, key, iv);
-        return this.crypt(cipher, data.toString('utf-8'));
-    };
-    KeyStore.prototype.crypt = function (cipher, data, iv) {
-        var _a = this.encryption, encoding = _a.encoding, ivSeparator = _a.ivSeparator;
-        var text = cipher.update(data.toString(), encoding);
-        var pad = cipher.final();
-        return __spreadArray(__spreadArray([], iv ? [iv.toString(encoding), ivSeparator] : [], true), [
-            text.toString(encoding),
-            pad.toString(encoding)
-        ]).join('');
-    };
-    KeyStore.prototype.decrypt = function (data, key, iv) {
+    KeyStore.prototype.encrypt = function (data, options) {
         if (!data) {
             return null;
         }
-        var _a = this.encryption, encoding = _a.encoding, ivSeparator = _a.ivSeparator, keys = _a.keys, algorithm = _a.algorithm;
-        if (!iv) {
-            var dataParts = data.split(ivSeparator);
-            if (dataParts.length !== 2 || !dataParts[0] || !dataParts[1]) {
-                // TODO: maybe throw ??
-                return null;
-            }
-            iv = dataParts[0];
-            data = dataParts[1];
+        var _a = options ? Object.assign({}, this.encryption, options) : this.encryption, keys = _a.keys, algorithm = _a.algorithm, encoding = _a.encoding, authTagLength = _a.authTagLength, key = _a.key;
+        var secret = key || keys[0];
+        if (!secret) {
+            throw new Error("no key found");
+        }
+        var cipherInfo = KeyStore.cipherInfo[algorithm];
+        if (!cipherInfo) {
+            throw new Error("unsupported cipher");
+        }
+        var iv = cipherInfo.ivLength ? crypto__default['default'].randomBytes(cipherInfo.ivLength) : null;
+        var dataBuff = typeof data === "string" ? Buffer.from(data, 'utf-8') : data;
+        var cipher = crypto__default['default'].createCipheriv(algorithm, secret, iv, { authTagLength: authTagLength });
+        var text = cipher.update(dataBuff);
+        var pad = cipher.final();
+        var authTag;
+        if (AUTH_TAG_REQUIRED.test(algorithm)) {
+            authTag = cipher.getAuthTag();
+        }
+        return Buffer.concat(__spreadArray(__spreadArray(__spreadArray([], iv ? [iv] : [], true), authTag ? [authTag] : [], true), [
+            text,
+            pad
+        ])).toString(encoding);
+    };
+    KeyStore.prototype.decrypt = function (data, options) {
+        if (!data) {
+            return null;
+        }
+        var finalOptions = options ? Object.assign({}, this.encryption, options) : this.encryption;
+        var encoding = finalOptions.encoding, key = finalOptions.key, defaultKeys = finalOptions.keys, algorithm = finalOptions.algorithm, authTagLength = finalOptions.authTagLength;
+        var keys = key ? [key] : defaultKeys;
+        if (keys.length === 0) {
+            throw new Error("keys required for encrypted cookies");
+        }
+        var iv = finalOptions.iv, authTag = finalOptions.authTag;
+        var dataBuff = typeof data === "string" ? Buffer.from(data, encoding) : data;
+        var cipherInfo = KeyStore.cipherInfo[algorithm];
+        if (!cipherInfo) {
+            throw new Error("unsupported cipher");
         }
         if (typeof iv === "string") {
             iv = Buffer.from(iv, encoding);
         }
-        if (!key) {
-            for (var i = 0; i < keys.length; i++) {
-                var message = this.decrypt(data, keys[i], iv);
-                if (message !== null)
-                    return message;
+        if (typeof authTag === "string") {
+            authTag = Buffer.from(authTag, encoding);
+        }
+        if (!iv) {
+            iv = dataBuff.slice(0, cipherInfo.ivLength);
+        }
+        dataBuff = dataBuff.slice(cipherInfo.ivLength, dataBuff.length);
+        if (AUTH_TAG_REQUIRED.test(algorithm)) {
+            if (!authTag) {
+                authTag = dataBuff.slice(0, authTagLength);
             }
-            return null;
+            dataBuff = dataBuff.slice(authTagLength, dataBuff.length);
         }
+        for (var i = 0; i < keys.length; i++) {
+            var message = KeyStore.doDecrypt(dataBuff, __assign(__assign({}, finalOptions), { key: keys[i], iv: iv, authTag: authTag }));
+            if (message !== null)
+                return message;
+        }
+        return null;
+    };
+    KeyStore.doDecrypt = function (data, options) {
+        var algorithm = options.algorithm, key = options.key, iv = options.iv, authTagLength = options.authTagLength, authTag = options.authTag;
+        var decipher = crypto__default['default'].createDecipheriv(algorithm, key, iv, { authTagLength: authTagLength });
+        if (authTag) {
+            decipher.setAuthTag(authTag);
+        }
+        var plainText = decipher.update(data);
         try {
-            var cipher = crypto__default['default'].createDecipheriv(algorithm, key, iv);
-            return this.crypt(cipher, data);
+            decipher.final();
         }
-        catch (err) {
+        catch (_a) {
+            // authentication failed
             return null;
         }
+        return plainText.toString('utf-8');
     };
     KeyStore.prototype.sign = function (data, key) {
+        if (!data) {
+            return null;
+        }
         var _a = this.signing, algorithm = _a.algorithm, encoding = _a.encoding, keys = _a.keys;
         key = key || keys[0];
         return crypto__default['default']
@@ -194,36 +284,56 @@ var KeyStore = /** @class */ (function () {
     };
     KeyStore.prototype.indexOf = function (data, digest) {
         var keys = this.signing.keys;
+        if (keys.length === 0) {
+            throw new Error("keys required for signed cookies");
+        }
         for (var i = 0; i < keys.length; i++) {
             if (compare__default['default'](digest, this.sign(data, keys[i])))
                 return i;
         }
         return -1;
     };
+    KeyStore.cipherInfo = CIPHER_INFO;
     return KeyStore;
 }());
 
 var cache = {};
-var defaultSignOptions = { identifier: 'sig' };
 var Cookies = /** @class */ (function () {
     function Cookies(request, response, options) {
+        if (options === void 0) { options = {}; }
         this.request = request;
         this.response = response;
-        if (!(options === null || options === void 0 ? void 0 : options.keyStore)) {
-            throw new Error(".keyStore is required");
-        }
-        this.keyStore = options.keyStore;
+        this.keyStore = options.keyStore || new KeyStore();
         this.secure = options.secure;
         this.signed = options.signed !== undefined ? options.signed : false;
         this.encrypted = options.encrypted !== undefined ? options.encrypted : false;
-        this.signOptions = Object.assign(defaultSignOptions, options.signOptions || {});
+        this.signIdentifier = options.signIdentifier || 'sig';
     }
+    /**
+     * This extracts the cookie with the given name from the Set-Cookie header in the request. If such a cookie exists, its value is returned. Otherwise, nothing is returned.
+     *
+     * `{ signed: true }` can optionally be passed as the second parameter options. In this case, a signature cookie (a cookie of same name ending with the .sig suffix appended) is fetched. If no such cookie exists, nothing is returned.
+     *
+     * If the signature cookie does exist, the provided KeyStore is used to check whether the hash of cookie-name=cookie-value matches that of any registered key/s:
+     *
+     * - If the signature cookie hash matches the first key, the original cookie value is returned.
+     * - If the signature cookie hash matches any other key, the original cookie value is returned AND an outbound header is set to update the signature cookie's value to the hash of the first key. This enables automatic freshening of signature cookies that have become stale due to key rotation.
+     * - If the signature cookie hash does not match any key, nothing is returned, and an outbound header with an expired date is used to delete the cookie.
+     *
+     * `{ encrypted: true }` can optionally be passed as the second parameter options. In this case, the provided KeyStore will try to decrypt the cookie value with registered key/s.
+     *
+     * - If the decryption fails nothing is returned, and the cookie stays intact.
+     * - If decryption succeeds, decrypted cookie value is returned.
+     *
+     * If both `signed` and `encrypted` options are provided, signature check will be applied with encrypted value. Than the decryption will be applied.
+     * @param name
+     * @param opts
+     */
     Cookies.prototype.get = function (name, opts) {
-        var signOptions = Object.assign(this.signOptions, (opts === null || opts === void 0 ? void 0 : opts.signOptions) || {});
-        var sigName = typeof (signOptions === null || signOptions === void 0 ? void 0 : signOptions.identifier) === 'function' ?
-            signOptions.identifier.call(null, name)
-            : "" + (name + '.' + ((signOptions === null || signOptions === void 0 ? void 0 : signOptions.identifier) || 'sig'));
-        var signed = opts && opts.signed !== undefined ? opts.signed : !!this.keyStore;
+        var sigId = (opts === null || opts === void 0 ? void 0 : opts.signIdentifier) || this.signIdentifier;
+        var sigName = typeof sigId === 'function' ? sigId.call(null, name)
+            : "" + (name + '.' + sigId);
+        var signed = opts && opts.signed !== undefined ? opts.signed : this.keyStore.signing.keys.length > 0;
         var encrypted = opts && opts.encrypted !== undefined ? opts.encrypted : this.encrypted;
         var header = this.request.headers['cookie'];
         if (!header) {
@@ -242,9 +352,6 @@ var Cookies = /** @class */ (function () {
             return undefined;
         }
         var data = name + "=" + value;
-        if (!this.keyStore) {
-            throw new Error('.keys required for signed cookies');
-        }
         var index = this.keyStore.indexOf(data, remote);
         if (index < 0) {
             this.set(sigName, null, { path: '/', signed: false });
@@ -255,12 +362,18 @@ var Cookies = /** @class */ (function () {
             return encrypted ? this.keyStore.decrypt(value) : value;
         }
     };
+    /**
+     * This sets the given cookie in the response and returns the current context to allow chaining.
+     *
+     * @param name Cookie name
+     * @param value Cookie value. If this is omitted, an outbound header with an expired date is used to delete the cookie.
+     * @param opts Overridden options
+     */
     Cookies.prototype.set = function (name, value, opts) {
         var res = this.response;
         var req = this.request;
         var headers = (res.getHeader('Set-Cookie') || []);
-        // @ts-ignore
-        var secure = this.secure !== undefined ? !!this.secure : req['protocol'] === 'https' || req.connection['encrypted'];
+        var secure = this.secure !== undefined ? !!this.secure : req.protocol === 'https' || req.connection['encrypted'];
         var encrypted = opts && opts.encrypted !== undefined ? opts.encrypted : this.encrypted;
         if (value !== null && encrypted) {
             value = this.keyStore.encrypt(value);
@@ -268,6 +381,7 @@ var Cookies = /** @class */ (function () {
         var cookie = new Cookie(name, value, opts);
         var signed = opts && opts.signed !== undefined ? opts.signed : this.signed;
         if (typeof headers == 'string') {
+            /* istanbul ignore next */
             headers = [headers];
         }
         if (!secure && opts && opts.secure) {
@@ -278,29 +392,26 @@ var Cookies = /** @class */ (function () {
             : secure;
         pushCookie(headers, cookie);
         if (opts && signed) {
-            if (!this.keyStore) {
-                throw new Error('.keys required for signed cookies');
-            }
             cookie.value = this.keyStore.sign(cookie.toString());
-            var signOptions = Object.assign(this.signOptions, (opts === null || opts === void 0 ? void 0 : opts.signOptions) || {});
-            cookie.name = typeof (signOptions === null || signOptions === void 0 ? void 0 : signOptions.identifier) === 'function' ?
-                signOptions.identifier.call(null, cookie.name)
-                : "" + (cookie.name + '.' + (signOptions.identifier || 'sig'));
+            var sigId = opts.signIdentifier || this.signIdentifier;
+            cookie.name = typeof sigId === 'function' ? sigId.call(null, cookie.name)
+                : "" + (cookie.name + '.' + sigId);
             pushCookie(headers, cookie);
         }
-        // @ts-ignore
         var setHeader = res["set"] ? http__default['default'].OutgoingMessage.prototype.setHeader : res.setHeader;
         setHeader.call(res, 'Set-Cookie', headers);
         return this;
     };
-    Cookies.middleware = function (keyStore) { return function (req, res, next) {
-        req.cookies = res.cookies = new Cookies(req, res, {
-            keyStore: keyStore
-        });
+    Cookies.middleware = function (options) { return function (req, res, next) {
+        req.cookies = res.cookies = new Cookies(req, res, options);
         next();
     }; };
     Cookies.connect = Cookies.middleware;
     Cookies.express = Cookies.middleware;
+    Cookies.koa = function (options) { return function (ctx, next) {
+        ctx.cookies = ctx.req.cookies = ctx.res.cookies = ctx.request.cookies = ctx.response.cookies = new Cookies(ctx.req, ctx.res, options);
+        next();
+    }; };
     return Cookies;
 }());
 function getPattern(name) {

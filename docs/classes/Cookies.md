@@ -15,7 +15,7 @@
 - [request](Cookies.md#request)
 - [response](Cookies.md#response)
 - [secure](Cookies.md#secure)
-- [signOptions](Cookies.md#signoptions)
+- [signIdentifier](Cookies.md#signidentifier)
 - [signed](Cookies.md#signed)
 - [connect](Cookies.md#connect)
 - [express](Cookies.md#express)
@@ -24,13 +24,14 @@
 
 - [get](Cookies.md#get)
 - [set](Cookies.md#set)
+- [koa](Cookies.md#koa)
 - [middleware](Cookies.md#middleware)
 
 ## Constructors
 
 ### constructor
 
-• **new Cookies**(`request`, `response`, `options`)
+• **new Cookies**(`request`, `response`, `options?`)
 
 #### Parameters
 
@@ -42,7 +43,7 @@
 
 #### Defined in
 
-cookies.ts:45
+[cookies.ts:56](https://github.com/ayZagen/secure-cookie/blob/428f17d/src/cookies.ts#L56)
 
 ## Properties
 
@@ -50,11 +51,9 @@ cookies.ts:45
 
 • **encrypted**: `boolean`
 
-Encrypt cookies by default and assume received cookies are encrypted.
-
 #### Defined in
 
-cookies.ts:35
+[cookies.ts:45](https://github.com/ayZagen/secure-cookie/blob/428f17d/src/cookies.ts#L45)
 
 ___
 
@@ -64,27 +63,27 @@ ___
 
 #### Defined in
 
-cookies.ts:44
+[cookies.ts:49](https://github.com/ayZagen/secure-cookie/blob/428f17d/src/cookies.ts#L49)
 
 ___
 
 ### request
 
-• **request**: `IncomingMessage` \| `Http2ServerRequest`
+• `Readonly` **request**: `IncomingMessage` \| `Http2ServerRequest`
 
 #### Defined in
 
-cookies.ts:41
+[cookies.ts:53](https://github.com/ayZagen/secure-cookie/blob/428f17d/src/cookies.ts#L53)
 
 ___
 
 ### response
 
-• **response**: `ServerResponse` \| `Http2ServerResponse`
+• `Readonly` **response**: `ServerResponse` \| `Http2ServerResponse`
 
 #### Defined in
 
-cookies.ts:42
+[cookies.ts:54](https://github.com/ayZagen/secure-cookie/blob/428f17d/src/cookies.ts#L54)
 
 ___
 
@@ -92,27 +91,19 @@ ___
 
 • `Optional` **secure**: `boolean`
 
-Mark cookies as secure by default.
-
 #### Defined in
 
-cookies.ts:30
+[cookies.ts:43](https://github.com/ayZagen/secure-cookie/blob/428f17d/src/cookies.ts#L43)
 
 ___
 
-### signOptions
+### signIdentifier
 
-• `Optional` **signOptions**: `Object`
-
-#### Type declaration
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `identifier` | `string` \| (`name`: `string`) => `string` | If string, provided value will be appended cookie name with dot. For example with given value `mysig` signature cookie name will be `cookiename.mysig`  **`default`** 'sig' |
+• `Optional` **signIdentifier**: `SignIdentifier`
 
 #### Defined in
 
-cookies.ts:43
+[cookies.ts:51](https://github.com/ayZagen/secure-cookie/blob/428f17d/src/cookies.ts#L51)
 
 ___
 
@@ -120,27 +111,25 @@ ___
 
 • **signed**: `boolean`
 
-Sign cookies by default and assume received cookies are signed
-
 #### Defined in
 
-cookies.ts:40
+[cookies.ts:47](https://github.com/ayZagen/secure-cookie/blob/428f17d/src/cookies.ts#L47)
 
 ___
 
 ### connect
 
-▪ `Static` **connect**: (`keyStore`: `KeyStore`) => (`req`: `any`, `res`: `any`, `next`: `any`) => `void`
+▪ `Static` **connect**: (`options?`: [`CookiesOptions`](../README.md#cookiesoptions)) => (`req`: `any`, `res`: `any`, `next`: `any`) => `void`
 
 #### Type declaration
 
-▸ (`keyStore`): (`req`: `any`, `res`: `any`, `next`: `any`) => `void`
+▸ (`options?`): (`req`: `any`, `res`: `any`, `next`: `any`) => `void`
 
 ##### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `keyStore` | `KeyStore` |
+| `options?` | [`CookiesOptions`](../README.md#cookiesoptions) |
 
 ##### Returns
 
@@ -162,23 +151,23 @@ ___
 
 #### Defined in
 
-cookies.ts:155
+[cookies.ts:185](https://github.com/ayZagen/secure-cookie/blob/428f17d/src/cookies.ts#L185)
 
 ___
 
 ### express
 
-▪ `Static` **express**: (`keyStore`: `KeyStore`) => (`req`: `any`, `res`: `any`, `next`: `any`) => `void`
+▪ `Static` **express**: (`options?`: [`CookiesOptions`](../README.md#cookiesoptions)) => (`req`: `any`, `res`: `any`, `next`: `any`) => `void`
 
 #### Type declaration
 
-▸ (`keyStore`): (`req`: `any`, `res`: `any`, `next`: `any`) => `void`
+▸ (`options?`): (`req`: `any`, `res`: `any`, `next`: `any`) => `void`
 
 ##### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `keyStore` | `KeyStore` |
+| `options?` | [`CookiesOptions`](../README.md#cookiesoptions) |
 
 ##### Returns
 
@@ -200,13 +189,30 @@ ___
 
 #### Defined in
 
-cookies.ts:156
+[cookies.ts:186](https://github.com/ayZagen/secure-cookie/blob/428f17d/src/cookies.ts#L186)
 
 ## Methods
 
 ### get
 
-▸ **get**(`name`, `opts?`): `undefined` \| ``null`` \| `string`
+▸ **get**(`name`, `opts?`): `undefined` \| `string`
+
+This extracts the cookie with the given name from the Set-Cookie header in the request. If such a cookie exists, its value is returned. Otherwise, nothing is returned.
+
+`{ signed: true }` can optionally be passed as the second parameter options. In this case, a signature cookie (a cookie of same name ending with the .sig suffix appended) is fetched. If no such cookie exists, nothing is returned.
+
+If the signature cookie does exist, the provided KeyStore is used to check whether the hash of cookie-name=cookie-value matches that of any registered key/s:
+
+- If the signature cookie hash matches the first key, the original cookie value is returned.
+- If the signature cookie hash matches any other key, the original cookie value is returned AND an outbound header is set to update the signature cookie's value to the hash of the first key. This enables automatic freshening of signature cookies that have become stale due to key rotation.
+- If the signature cookie hash does not match any key, nothing is returned, and an outbound header with an expired date is used to delete the cookie.
+
+`{ encrypted: true }` can optionally be passed as the second parameter options. In this case, the provided KeyStore will try to decrypt the cookie value with registered key/s.
+
+- If the decryption fails nothing is returned, and the cookie stays intact.
+- If decryption succeeds, decrypted cookie value is returned.
+
+If both `signed` and `encrypted` options are provided, signature check will be applied with encrypted value. Than the decryption will be applied.
 
 #### Parameters
 
@@ -217,11 +223,11 @@ cookies.ts:156
 
 #### Returns
 
-`undefined` \| ``null`` \| `string`
+`undefined` \| `string`
 
 #### Defined in
 
-cookies.ts:59
+[cookies.ts:87](https://github.com/ayZagen/secure-cookie/blob/428f17d/src/cookies.ts#L87)
 
 ___
 
@@ -229,13 +235,15 @@ ___
 
 ▸ **set**(`name`, `value`, `opts`): [`Cookies`](Cookies.md)
 
+This sets the given cookie in the response and returns the current context to allow chaining.
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `name` | `string` |
-| `value` | ``null`` \| `string` |
-| `opts` | [`CookiesOptions`](../README.md#cookiesoptions) & `CookieAttrs` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `name` | `string` | Cookie name |
+| `value` | ``null`` \| `string` | Cookie value. If this is omitted, an outbound header with an expired date is used to delete the cookie. |
+| `opts` | [`SetCookies`](../README.md#setcookies) | Overridden options |
 
 #### Returns
 
@@ -243,19 +251,52 @@ ___
 
 #### Defined in
 
-cookies.ts:103
+[cookies.ts:136](https://github.com/ayZagen/secure-cookie/blob/428f17d/src/cookies.ts#L136)
 
 ___
 
-### middleware
+### koa
 
-▸ `Static` **middleware**(`keyStore`): (`req`: `any`, `res`: `any`, `next`: `any`) => `void`
+▸ `Static` **koa**(`options?`): (`ctx`: `any`, `next`: `any`) => `void`
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `keyStore` | `KeyStore` |
+| `options?` | [`CookiesOptions`](../README.md#cookiesoptions) |
+
+#### Returns
+
+`fn`
+
+▸ (`ctx`, `next`): `void`
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `ctx` | `any` |
+| `next` | `any` |
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[cookies.ts:187](https://github.com/ayZagen/secure-cookie/blob/428f17d/src/cookies.ts#L187)
+
+___
+
+### middleware
+
+▸ `Static` **middleware**(`options?`): (`req`: `any`, `res`: `any`, `next`: `any`) => `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `options?` | [`CookiesOptions`](../README.md#cookiesoptions) |
 
 #### Returns
 
@@ -277,4 +318,4 @@ ___
 
 #### Defined in
 
-cookies.ts:148
+[cookies.ts:180](https://github.com/ayZagen/secure-cookie/blob/428f17d/src/cookies.ts#L180)

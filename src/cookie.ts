@@ -3,13 +3,37 @@ const fieldContentRegExp = /^[\u0009\u0020-\u007e\u0080-\u00ff]+$/;
 const SAME_SITE_REGEXP = /^(?:lax|none|strict)$/i;
 
 export interface CookieAttrs {
+  /**
+   * a `Date` object indicating the cookie's expiration date (expires at the end of session by default).
+   */
   expires?: Date;
+  /**
+   * a number representing the milliseconds from `Date.now()` for expiry
+   */
   maxAge?: number | null;
+  /**
+   * a boolean or string indicating whether the cookie is a "same site" cookie (`false` by default). This can be set to `'strict'`, `'lax'`, `'none'`, or `true` (which maps to `'strict'`).
+   */
   sameSite?: 'lax' | 'none' | 'strict' | boolean;
+  /**
+   * a string indicating the path of the cookie (`/` by default).
+   */
   path?: string;
+  /**
+   * a string indicating the domain of the cookie (no default).
+   */
   domain?: string;
+  /**
+   * a boolean indicating whether the cookie is only to be sent over HTTPS (`false` by default for HTTP, `true` by default for HTTPS).
+   */
   secure?: boolean | undefined;
+  /**
+   * a boolean indicating whether the cookie is only to be sent over HTTP(S), and not made available to client JavaScript (`true` by default).
+   */
   httpOnly?: boolean;
+  /**
+   * a boolean indicating whether to overwrite previously set cookies of the same name (`false` by default). If this is true, all cookies set during the same request with the same name (regardless of path or domain) are filtered out of the Set-Cookie header when setting this cookie.
+   */
   overwrite?: boolean;
 }
 
