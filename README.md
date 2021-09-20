@@ -39,6 +39,8 @@ app.use(Cookies.express({
   signed: true,
   keyStore: new KeyStore({
     signing: {
+  //  encoding: 'base64',
+  //  algorithm: 'sha1',
       keys: ["mysigningkey"]
     }
   })
@@ -54,7 +56,6 @@ app.get('/some-route', function (req, res, next) {
 ```
 
 ### Encrypted Cookies
-
 ```javascript
 const {Cookies, KeyStore} = require('secure-cookies')
 
@@ -64,6 +65,9 @@ app.use(Cookies.express({
   signed: true,
   keyStore: new KeyStore({
     encryption: {
+   // algorithm: 'aes-192-ccm',
+   // authTagLength: 16,
+   // encoding: 'hex',
       keys: ["a24bytesecretmustchanged"]
     }
   })
@@ -79,6 +83,20 @@ app.get('/get-cookie', function (req, res, next) {
   assert.equal(myCookie, "someValue")
 })
 ```
+
+Make sure selected algorithm is supported by your NodeJs version.
+By default `aes-192-ccm` is selected. You can override that and related settings from KeyStore constructor options.
+If the algorithm you would like to use is missing from the default ones you can add it by following:
+
+```javascript
+const {KeyStore} = require('secure-cookies')
+
+KeyStore.cipherInfo = Object.assign(KeyStore.cipherInfo, {
+  'aes-xxx-xxx': { ivLength: 16, keyLength: 16 },
+})
+```
+
+You can see included algorithms from [src/ciphers.ts](/src/ciphers.ts)
 
 For all options and internals have a look at to [API documentation](./docs/README.md).
 
