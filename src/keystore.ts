@@ -123,7 +123,7 @@ export class KeyStore {
       authTagLength,
     } = finalOptions
 
-    const keys = key ? [ key ] : defaultKeys
+    const keys = key ? [key] : defaultKeys
     if (keys.length === 0) {
       throw new Error("keys required for encrypted cookies")
     }
@@ -148,10 +148,12 @@ export class KeyStore {
       authTag = Buffer.from(authTag, encoding)
     }
 
-    if (!iv) {
-      iv = dataBuff.slice(0, cipherInfo.ivLength)
+    if (cipherInfo.ivLength !== undefined) {
+      if (!iv) {
+        iv = dataBuff.slice(0, cipherInfo.ivLength)
+      }
+      dataBuff = dataBuff.slice(cipherInfo.ivLength, dataBuff.length)
     }
-    dataBuff = dataBuff.slice(cipherInfo.ivLength, dataBuff.length)
 
 
     if (AUTH_TAG_REQUIRED.test(algorithm)) {
@@ -170,20 +172,21 @@ export class KeyStore {
 
   private static doDecrypt(data: Buffer, options: DecryptOptions): string | null {
     const {algorithm, key, iv, authTagLength, authTag} = options
-    const decipher = crypto.createDecipheriv(algorithm as any, key!, iv as Buffer, {authTagLength});
+    const decipher = crypto.createDecipheriv(algorithm as any, key!, iv as Buffer || null, {authTagLength});
 
     if (authTag) {
       decipher.setAuthTag(authTag as Buffer)
     }
 
     const plainText = decipher.update(data)
+    let final: Buffer
     try {
-      decipher.final()
-    } catch {
+      final = decipher.final()
+    } catch(e:any) {
       // authentication failed
       return null
     }
-    return plainText.toString('utf-8')
+    return Buffer.concat([plainText, final]).toString('utf-8')
   }
 
   //region: signing

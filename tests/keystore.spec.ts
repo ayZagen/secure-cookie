@@ -247,6 +247,20 @@ describe("encryption", () => {
       expect(decrypted).toBe(null)
     });
 
+
+    it("should allow using different secret key", () => {
+      const ks = new KeyStore({
+        encryption: {
+          keys: ["secretsecretsecretsecret"],
+          algorithm: "aes-192-cbc",
+          encoding: "hex"
+        }
+      })
+      jest.spyOn(crypto, 'randomBytes').mockImplementationOnce(() => Buffer.from("1234123412341234", "utf-8"))
+      const encrypted = ks.encrypt("ohmytext", {key: "necretnecretnecretnecret"})
+      expect(ks.decrypt(encrypted, { key: "necretnecretnecretnecret" })).toBe("ohmytext")
+    })
+
     it("should fail if no key exists to decrypt with", () => {
       const ks = new KeyStore({
         encryption: {keys: [genRandom(24)]}
@@ -255,6 +269,19 @@ describe("encryption", () => {
       expect(() => {
         ks.decrypt("ohmytext")
       }).toThrow(Error)
+    })
+
+
+    it("should work w/ algorithms without iv", () => {
+      const ks = new KeyStore({
+        encryption: {
+          keys: ["32secretsecretsecretsecretsecret"],
+          algorithm: "aes-256-ecb",
+          encoding: "base64"
+        }
+      })
+      const encrypted = ks.encrypt("ohmytext")
+      expect(ks.decrypt(encrypted)).toBe("ohmytext")
     })
 
     it("should accept iv buffer", () => {
