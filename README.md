@@ -90,10 +90,7 @@ If the algorithm you would like to use is missing from the default ones you can 
 
 ```javascript
 const {KeyStore} = require('secure-cookies')
-
-KeyStore.cipherInfo = Object.assign(KeyStore.cipherInfo, {
-  'aes-xxx-xxx': { ivLength: 16, keyLength: 16 },
-})
+KeyStore.cipherInfo['aes-xxx-xxx'] =  { ivLength: 16, keyLength: 16 }
 ```
 
 You can see included algorithms from [src/ciphers.ts](/src/ciphers.ts)
