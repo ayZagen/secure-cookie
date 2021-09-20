@@ -6,7 +6,8 @@
 
 # Node.js modules.
 node_modules/
-
+.idea
+.vscode
 # NPM's shrinkwrap.
 # We're using `package-lock.json` instead.
 npm-shrinkwrap.json
