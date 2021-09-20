@@ -10,7 +10,7 @@ jobs:
         with:
           node-version: 14.x
       - run: npm i
-      - run: npm run test:unit -- --ci --watchAll=false
+      - run: npm run test:unit -- --ci --watchAll=false --forceExit
         env:
           CI: true
       - name: Upload coverage to Codecov
