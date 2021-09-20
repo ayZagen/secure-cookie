@@ -1,5 +1,5 @@
 /*!
- * secure-cookie v0.0.1
+ * secure-cookie v0.0.2
  * (c) Ismail H. Ayaz
  * Released under the MIT License.
  */
@@ -233,10 +233,12 @@ var KeyStore = /** @class */ (function () {
         if (typeof authTag === "string") {
             authTag = Buffer.from(authTag, encoding);
         }
-        if (!iv) {
-            iv = dataBuff.slice(0, cipherInfo.ivLength);
+        if (cipherInfo.ivLength !== undefined) {
+            if (!iv) {
+                iv = dataBuff.slice(0, cipherInfo.ivLength);
+            }
+            dataBuff = dataBuff.slice(cipherInfo.ivLength, dataBuff.length);
         }
-        dataBuff = dataBuff.slice(cipherInfo.ivLength, dataBuff.length);
         if (AUTH_TAG_REQUIRED.test(algorithm)) {
             if (!authTag) {
                 authTag = dataBuff.slice(0, authTagLength);
@@ -252,19 +254,20 @@ var KeyStore = /** @class */ (function () {
     };
     KeyStore.doDecrypt = function (data, options) {
         var algorithm = options.algorithm, key = options.key, iv = options.iv, authTagLength = options.authTagLength, authTag = options.authTag;
-        var decipher = crypto__default['default'].createDecipheriv(algorithm, key, iv, { authTagLength: authTagLength });
+        var decipher = crypto__default['default'].createDecipheriv(algorithm, key, iv || null, { authTagLength: authTagLength });
         if (authTag) {
             decipher.setAuthTag(authTag);
         }
         var plainText = decipher.update(data);
+        var final;
         try {
-            decipher.final();
+            final = decipher.final();
         }
-        catch (_a) {
+        catch (e) {
             // authentication failed
             return null;
         }
-        return plainText.toString('utf-8');
+        return Buffer.concat([plainText, final]).toString('utf-8');
     };
     KeyStore.prototype.sign = function (data, key) {
         if (!data) {
@@ -380,8 +383,8 @@ var Cookies = /** @class */ (function () {
         }
         var cookie = new Cookie(name, value, opts);
         var signed = opts && opts.signed !== undefined ? opts.signed : this.signed;
+        /* istanbul ignore next */
         if (typeof headers == 'string') {
-            /* istanbul ignore next */
             headers = [headers];
         }
         if (!secure && opts && opts.secure) {
