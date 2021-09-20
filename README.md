@@ -14,7 +14,7 @@
 Nodejs cookie library with signing and encryption support. For those familiar with
 [`cookies`](https://github.com/pillarjs/cookies)
 and  [`crypto-utils/keygrip`](https://github.com/crypto-utils/keygrip)
-this library is almost the same except encryption support.
+this library is almost the same plus encryption support.
 
 ## Installation
 
