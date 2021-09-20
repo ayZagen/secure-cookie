@@ -63,7 +63,7 @@ app.use(Cookies.express({
   signed: true,
   keyStore: new KeyStore({
     encryption: {
-      keys: ["24bitsecretmustbechanged"]
+      keys: ["a24bytesecretmustchanged"]
     }
   })
 }))
