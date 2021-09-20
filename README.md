@@ -3,11 +3,14 @@
 <a href="https://github.com/ayZagen/secure-cookie/actions?query=workflow%3Aci">
 <img src="https://github.com/ayZagen/secure-cookie/workflows/ci/badge.svg" alt="Build Status">
 </a>
-[![License](https://badgen.net/github/license/ayZagen/secure-cookie)](./LICENSE)
-
 <a href="https://codecov.io/gh/PlusAuth/plusauth-oidc-client-js">
 <img alt="Codecov" src="https://img.shields.io/codecov/c/gh/ayZagen/secure-cookie?logo=codecov&style=flat-square">
 </a>
+<a href="./LICENSE">
+<img alt="License" src="https://badgen.net/github/license/ayZagen/secure-cookie">
+</a>
+
+
 Nodejs cookie library with signing and encryption support. Inspired from [`cookies`](https://github.com/pillarjs/cookies) and  [`crypto-utils/keygrip`](https://github.com/crypto-utils/keygrip)
 
 ## Installation
