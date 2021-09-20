@@ -3,7 +3,7 @@
 <a href="https://github.com/ayZagen/secure-cookie/actions?query=workflow%3Aci">
 <img src="https://github.com/ayZagen/secure-cookie/workflows/ci/badge.svg" alt="Build Status">
 </a>
-<a href="https://codecov.io/gh/PlusAuth/plusauth-oidc-client-js">
+<a href="https://codecov.io/gh/ayZagen/secure-cookie">
 <img alt="Codecov" src="https://img.shields.io/codecov/c/gh/ayZagen/secure-cookie?logo=codecov&style=flat-square">
 </a>
 <a href="./LICENSE">
