@@ -106,6 +106,20 @@ describe("encryption", () => {
       expect(encrypted).toBe("313233343132333431323334d0658e97af34ad7906a0724657faee5c062a9b5842925dc0".toLowerCase())
     })
 
+    it("should work w/ buffer", () => {
+      const ks = new KeyStore({
+        encryption: {
+          keys: ["secretsecretsecretsecret"],
+          algorithm: "aes-192-ccm",
+          encoding: "hex",
+          authTagLength: 16
+        }
+      })
+      jest.spyOn(crypto, 'randomBytes').mockImplementationOnce(() => Buffer.from("123412341234", "utf-8"))
+      const encrypted = ks.encrypt(Buffer.from("ohmytext", "utf-8"))
+      expect(encrypted).toBe("313233343132333431323334d0658e97af34ad7906a0724657faee5c062a9b5842925dc0".toLowerCase())
+    })
+
     it('should return null if data is not defined', function () {
       const ks = new KeyStore({
         encryption: {keys: [genRandom(24)]}
@@ -208,6 +222,31 @@ describe("encryption", () => {
       expect(decrypted).toBe("ohmytext")
     })
 
+    it("should work w/ buffer", () => {
+      const ks = new KeyStore({
+        encryption: {
+          keys: ["secretsecretsecretsecret"],
+          encoding: "base64"
+        }
+      })
+      const encrypted = ks.encrypt("ohmytext")
+
+      const decrypted = ks.decrypt(Buffer.from(encrypted, "base64"))
+      expect(decrypted).toBe("ohmytext")
+    })
+
+    it('should return null if auth fails', function () {
+      const ks = new KeyStore({
+        encryption: {
+          keys: ["secretsecretsecretsecret"],
+          encoding: "base64"
+        }
+      })
+      const encrypted = ks.encrypt("ohmytext")
+      const decrypted = ks.decrypt(encrypted, { authTag: Buffer.from("1234567812345678", "utf-8")})
+      expect(decrypted).toBe(null)
+    });
+
     it("should fail if no key exists to decrypt with", () => {
       const ks = new KeyStore({
         encryption: {keys: [genRandom(24)]}
@@ -231,6 +270,7 @@ describe("encryption", () => {
         iv: Buffer.from("123412341234", "utf-8")
       })).toBe("ohmytext")
     })
+
     it("should accept iv string", () => {
       const ks = new KeyStore({
         encryption: {
@@ -258,6 +298,7 @@ describe("encryption", () => {
         authTag: Buffer.from("d0658e97af34ad7906a0724657faee5c", "hex")
       })).toBe("ohmytext")
     })
+
     it("should accept authTag string", () => {
       const ks = new KeyStore({
         encryption: {
@@ -288,7 +329,6 @@ describe("encryption", () => {
       }).toThrow(Error)
     })
 
-
     it("should work with different authTagLength", () => {
       const ks = new KeyStore({
         encryption: {
@@ -309,6 +349,16 @@ describe("encryption", () => {
 describe("signing", () => {
 
   describe('.indexOf(data)', function () {
+    it('should w/ no keys', function () {
+      const ks = new KeyStore({
+        encryption: {keys: [genRandom(24)]}
+      })
+      ks.encryption.keys = []
+      expect(() => {
+        ks.indexOf("ohmytext", "ohmytext")
+      }).toThrow(Error)
+    });
+
     it('should return key index that signed data', function () {
       const keys = new KeyStore({signing: {keys: ['SEKRIT2', 'SEKRIT1']}})
       const data = 'Keyboard Cat has a hat.'
