@@ -22,7 +22,8 @@
     "test:unit": "jest",
     "lint": "eslint \"*/**/*.{ts,js,json}\" --fix --quiet",
     "build": "rollup --config ./rollup.config.js",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "release": "release-it"
   },
   "dependencies": {
     "tsscmp": "^1.0.6"
