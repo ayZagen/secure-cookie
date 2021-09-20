@@ -147,8 +147,8 @@ export class Cookies {
     const cookie = new Cookie(name, value, opts);
     const signed = opts && opts.signed !== undefined ? opts.signed : this.signed;
 
+    /* istanbul ignore next */
     if (typeof headers == 'string') {
-      /* istanbul ignore next */
       headers = [headers];
     }
 
