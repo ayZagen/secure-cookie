@@ -1,5 +1,5 @@
 /*!
- * secure-cookie v0.0.2
+ * secure-cookie v0.0.3
  * (c) Ismail H. Ayaz
  * Released under the MIT License.
  */

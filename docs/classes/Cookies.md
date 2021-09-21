@@ -43,7 +43,7 @@
 
 #### Defined in
 
-[cookies.ts:56](https://github.com/ayZagen/secure-cookie/blob/703af9a/src/cookies.ts#L56)
+[cookies.ts:56](https://github.com/ayZagen/secure-cookie/blob/74cf6ab/src/cookies.ts#L56)
 
 ## Properties
 
@@ -53,7 +53,7 @@
 
 #### Defined in
 
-[cookies.ts:45](https://github.com/ayZagen/secure-cookie/blob/703af9a/src/cookies.ts#L45)
+[cookies.ts:45](https://github.com/ayZagen/secure-cookie/blob/74cf6ab/src/cookies.ts#L45)
 
 ___
 
@@ -63,7 +63,7 @@ ___
 
 #### Defined in
 
-[cookies.ts:49](https://github.com/ayZagen/secure-cookie/blob/703af9a/src/cookies.ts#L49)
+[cookies.ts:49](https://github.com/ayZagen/secure-cookie/blob/74cf6ab/src/cookies.ts#L49)
 
 ___
 
@@ -73,7 +73,7 @@ ___
 
 #### Defined in
 
-[cookies.ts:53](https://github.com/ayZagen/secure-cookie/blob/703af9a/src/cookies.ts#L53)
+[cookies.ts:53](https://github.com/ayZagen/secure-cookie/blob/74cf6ab/src/cookies.ts#L53)
 
 ___
 
@@ -83,7 +83,7 @@ ___
 
 #### Defined in
 
-[cookies.ts:54](https://github.com/ayZagen/secure-cookie/blob/703af9a/src/cookies.ts#L54)
+[cookies.ts:54](https://github.com/ayZagen/secure-cookie/blob/74cf6ab/src/cookies.ts#L54)
 
 ___
 
@@ -93,7 +93,7 @@ ___
 
 #### Defined in
 
-[cookies.ts:43](https://github.com/ayZagen/secure-cookie/blob/703af9a/src/cookies.ts#L43)
+[cookies.ts:43](https://github.com/ayZagen/secure-cookie/blob/74cf6ab/src/cookies.ts#L43)
 
 ___
 
@@ -103,7 +103,7 @@ ___
 
 #### Defined in
 
-[cookies.ts:51](https://github.com/ayZagen/secure-cookie/blob/703af9a/src/cookies.ts#L51)
+[cookies.ts:51](https://github.com/ayZagen/secure-cookie/blob/74cf6ab/src/cookies.ts#L51)
 
 ___
 
@@ -113,7 +113,7 @@ ___
 
 #### Defined in
 
-[cookies.ts:47](https://github.com/ayZagen/secure-cookie/blob/703af9a/src/cookies.ts#L47)
+[cookies.ts:47](https://github.com/ayZagen/secure-cookie/blob/74cf6ab/src/cookies.ts#L47)
 
 ___
 
@@ -151,7 +151,7 @@ ___
 
 #### Defined in
 
-[cookies.ts:185](https://github.com/ayZagen/secure-cookie/blob/703af9a/src/cookies.ts#L185)
+[cookies.ts:185](https://github.com/ayZagen/secure-cookie/blob/74cf6ab/src/cookies.ts#L185)
 
 ___
 
@@ -189,7 +189,7 @@ ___
 
 #### Defined in
 
-[cookies.ts:186](https://github.com/ayZagen/secure-cookie/blob/703af9a/src/cookies.ts#L186)
+[cookies.ts:186](https://github.com/ayZagen/secure-cookie/blob/74cf6ab/src/cookies.ts#L186)
 
 ## Methods
 
@@ -227,7 +227,7 @@ If both `signed` and `encrypted` options are provided, signature check will be a
 
 #### Defined in
 
-[cookies.ts:87](https://github.com/ayZagen/secure-cookie/blob/703af9a/src/cookies.ts#L87)
+[cookies.ts:87](https://github.com/ayZagen/secure-cookie/blob/74cf6ab/src/cookies.ts#L87)
 
 ___
 
@@ -251,7 +251,7 @@ This sets the given cookie in the response and returns the current context to al
 
 #### Defined in
 
-[cookies.ts:136](https://github.com/ayZagen/secure-cookie/blob/703af9a/src/cookies.ts#L136)
+[cookies.ts:136](https://github.com/ayZagen/secure-cookie/blob/74cf6ab/src/cookies.ts#L136)
 
 ___
 
@@ -284,7 +284,7 @@ ___
 
 #### Defined in
 
-[cookies.ts:187](https://github.com/ayZagen/secure-cookie/blob/703af9a/src/cookies.ts#L187)
+[cookies.ts:187](https://github.com/ayZagen/secure-cookie/blob/74cf6ab/src/cookies.ts#L187)
 
 ___
 
@@ -318,4 +318,4 @@ ___
 
 #### Defined in
 
-[cookies.ts:180](https://github.com/ayZagen/secure-cookie/blob/703af9a/src/cookies.ts#L180)
+[cookies.ts:180](https://github.com/ayZagen/secure-cookie/blob/74cf6ab/src/cookies.ts#L180)
