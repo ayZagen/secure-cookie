@@ -1,20 +1,14 @@
-# secure-cookie
+secure-cookie
+==============
 
-<a href="https://github.com/ayZagen/secure-cookie/actions?query=workflow%3Aci">
-<img src="https://github.com/ayZagen/secure-cookie/workflows/ci/badge.svg" alt="Build Status">
-</a>
-<a href="https://codecov.io/gh/ayZagen/secure-cookie">
-<img alt="Codecov" src="https://img.shields.io/codecov/c/gh/ayZagen/secure-cookie?logo=codecov&style=flat-square">
-</a>
-<a href="./LICENSE">
-<img alt="License" src="https://badgen.net/github/license/ayZagen/secure-cookie">
-</a>
-
+[![NPM Version][npm-badge]][npm-url]
+[![Build Status][ci-badge]][ci-url]
+[![Test Coverage][codecov-badge]][codecov-url]
+[![Licencse][license-badge]][license-url]
 
 Nodejs cookie library with signing and encryption support. For those familiar with
 [`cookies`](https://github.com/pillarjs/cookies)
-and  [`crypto-utils/keygrip`](https://github.com/crypto-utils/keygrip)
-this library is almost the same plus encryption support.
+this library is almost the same plus encryption and additional configuration support.
 
 ## Installation
 
@@ -100,3 +94,13 @@ For all options and internals have a look at to [API documentation](./docs/READM
 ## License
 
 Released under [MIT License](./LICENSE).
+
+
+[npm-badge]: https://img.shields.io/npm/v/secure-cookie.svg
+[npm-url]: https://www.npmjs.com/package/secure-cookie
+[codecov-badge]: https://img.shields.io/codecov/c/gh/ayZagen/secure-cookie?logo=codecov
+[codecov-url]: https://codecov.io/gh/ayZagen/secure-cookie
+[ci-badge]: https://github.com/ayZagen/secure-cookie/workflows/ci/badge.svg
+[ci-url]: https://github.com/ayZagen/secure-cookie/actions?query=workflow%3Aci
+[license-badge]: https://badgen.net/github/license/ayZagen/secure-cookie
+[license-url]: ./LICENSE
