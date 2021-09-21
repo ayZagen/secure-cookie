@@ -11,8 +11,8 @@ secure-cookie
 ### Type aliases
 
 - [CookiesOptions](README.md#cookiesoptions)
-- [GetCookieOptions](README.md#getcookies)
-- [SetCookieOptions](README.md#setcookies)
+- [GetCookieOptions](README.md#getcookieoptions)
+- [SetCookieOptions](README.md#setcookieoptions)
 
 ## Type aliases
 
@@ -32,7 +32,7 @@ secure-cookie
 
 #### Defined in
 
-[cookies.ts:8](https://github.com/ayZagen/secure-cookie/blob/74cf6ab/src/cookies.ts#L8)
+[cookies.ts:8](https://github.com/ayZagen/secure-cookie/blob/5d69c74/src/cookies.ts#L8)
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 #### Defined in
 
-[cookies.ts:39](https://github.com/ayZagen/secure-cookie/blob/74cf6ab/src/cookies.ts#L39)
+[cookies.ts:39](https://github.com/ayZagen/secure-cookie/blob/5d69c74/src/cookies.ts#L39)
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 #### Defined in
 
-[cookies.ts:38](https://github.com/ayZagen/secure-cookie/blob/74cf6ab/src/cookies.ts#L38)
+[cookies.ts:38](https://github.com/ayZagen/secure-cookie/blob/5d69c74/src/cookies.ts#L38)

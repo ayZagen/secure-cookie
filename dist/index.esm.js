@@ -1,5 +1,5 @@
 /*!
- * secure-cookie v0.0.3
+ * secure-cookie v0.0.4
  * (c) Ismail H. Ayaz
  * Released under the MIT License.
  */
@@ -363,15 +363,9 @@ var Cookies = /** @class */ (function () {
      * @param opts Overridden options
      */
     Cookies.prototype.set = function (name, value, opts) {
-        var res = this.response;
-        var req = this.request;
+        var res = this.response, req = this.request, secure = this.secure !== undefined ? !!this.secure : req.protocol === 'https' || req.connection['encrypted'], encrypted = opts && opts.encrypted !== undefined ? opts.encrypted : this.encrypted;
         var headers = (res.getHeader('Set-Cookie') || []);
-        var secure = this.secure !== undefined ? !!this.secure : req.protocol === 'https' || req.connection['encrypted'];
-        var encrypted = opts && opts.encrypted !== undefined ? opts.encrypted : this.encrypted;
-        if (value !== null && encrypted) {
-            value = this.keyStore.encrypt(value);
-        }
-        var cookie = new Cookie(name, value, opts);
+        var cookie = new Cookie(name, encrypted ? this.keyStore.encrypt(value) : value, opts);
         var signed = opts && opts.signed !== undefined ? opts.signed : this.signed;
         /* istanbul ignore next */
         if (typeof headers == 'string') {
@@ -380,15 +374,17 @@ var Cookies = /** @class */ (function () {
         if (!secure && opts && opts.secure) {
             throw new Error('Cannot send secure cookie over unencrypted connection');
         }
-        cookie.secure = opts && opts.secure !== undefined
-            ? opts.secure
-            : secure;
+        cookie.secure = opts && opts.secure !== undefined ? opts.secure : secure;
         pushCookie(headers, cookie);
         if (opts && signed) {
             cookie.value = this.keyStore.sign(cookie.toString());
             var sigId = opts.signIdentifier || this.signIdentifier;
-            cookie.name = typeof sigId === 'function' ? sigId.call(null, cookie.name)
-                : "" + (cookie.name + '.' + sigId);
+            if (typeof sigId === 'function') {
+                cookie.name = sigId.call(null, cookie.name);
+            }
+            else {
+                cookie.name = "" + (cookie.name + '.' + sigId);
+            }
             pushCookie(headers, cookie);
         }
         var setHeader = res["set"] ? http.OutgoingMessage.prototype.setHeader : res.setHeader;
@@ -402,7 +398,11 @@ var Cookies = /** @class */ (function () {
     Cookies.connect = Cookies.middleware;
     Cookies.express = Cookies.middleware;
     Cookies.koa = function (options) { return function (ctx, next) {
-        ctx.cookies = ctx.req.cookies = ctx.res.cookies = ctx.request.cookies = ctx.response.cookies = new Cookies(ctx.req, ctx.res, options);
+        ctx.cookies
+            = ctx.req.cookies
+                = ctx.res.cookies
+                    = ctx.request.cookies
+                        = ctx.response.cookies = new Cookies(ctx.req, ctx.res, options);
         next();
     }; };
     return Cookies;
