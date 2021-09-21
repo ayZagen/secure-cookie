@@ -1,3 +1,10 @@
+## [0.0.7](https://github.com/ayZagen/secure-cookie/compare/v0.0.6...v0.0.7) (2021-09-21)
+
+
+### Bug Fixes
+
+* koa middleware fails with async ([e57275f](https://github.com/ayZagen/secure-cookie/commit/e57275fe2bff66c853a6ba146e10341059715916))
+
 ## [0.0.6](https://github.com/ayZagen/secure-cookie/compare/v0.0.5...v0.0.6) (2021-09-21)
 
 ## [0.0.5](https://github.com/ayZagen/secure-cookie/compare/v0.0.4...v0.0.5) (2021-09-21)

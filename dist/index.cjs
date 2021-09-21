@@ -1,5 +1,5 @@
 /*!
- * secure-cookie v0.0.6
+ * secure-cookie v0.0.7
  * (c) Ismail H. Ayaz
  * Released under the MIT License.
  */
@@ -413,7 +413,7 @@ var Cookies = /** @class */ (function () {
                 = ctx.res.cookies
                     = ctx.request.cookies
                         = ctx.response.cookies = new Cookies(ctx.req, ctx.res, options);
-        next();
+        return next();
     }; };
     return Cookies;
 }());
