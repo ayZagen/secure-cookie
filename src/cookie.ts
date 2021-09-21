@@ -26,7 +26,7 @@ export interface CookieAttrs {
   /**
    * a boolean indicating whether the cookie is only to be sent over HTTPS (`false` by default for HTTP, `true` by default for HTTPS).
    */
-  secure?: boolean | undefined;
+  secure?: boolean;
   /**
    * a boolean indicating whether the cookie is only to be sent over HTTP(S), and not made available to client JavaScript (`true` by default).
    */

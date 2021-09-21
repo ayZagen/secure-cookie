@@ -25,7 +25,7 @@ export type CookiesOptions = {
    * Mark cookies as secure by default.
    * @default `req.protocol`
    */
-  secure?: boolean | undefined;
+  secure?: boolean;
   /**
    * If string, provided value will be appended cookie name with dot. For example with given value `mysig`
    * signature cookie name will be `cookiename.mysig`
@@ -40,7 +40,7 @@ export type GetCookieOptions = CookiesOptions
 
 export class Cookies {
 
-  secure?: CookiesOptions["secure"];
+  secure: CookiesOptions["secure"];
 
   encrypted: boolean;
 
