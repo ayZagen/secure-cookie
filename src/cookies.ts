@@ -1,9 +1,9 @@
-import http, { IncomingMessage, ServerResponse } from 'http';
-import { Cookie, CookieAttrs } from './cookie';
+import http, {IncomingMessage, ServerResponse} from 'http';
+import {Cookie, CookieAttrs} from './cookie';
 import {KeyStore} from "./keystore";
 import type {Http2ServerRequest, Http2ServerResponse} from "http2";
 
-const cache: { [key:string]: RegExp } = {} as any;
+const cache: { [key: string]: RegExp } = {} as any;
 type SignIdentifier = string | ((name: string) => string)
 export type CookiesOptions = {
 
@@ -35,8 +35,8 @@ export type CookiesOptions = {
   signIdentifier?: SignIdentifier
 }
 
-export type SetCookies = CookiesOptions & CookieAttrs
-export type GetCookies = CookiesOptions
+export type SetCookieOptions = CookiesOptions & CookieAttrs
+export type GetCookieOptions = CookiesOptions
 
 export class Cookies {
 
@@ -84,11 +84,11 @@ export class Cookies {
    * @param name
    * @param opts
    */
-  get(name: string, opts?: GetCookies) {
+  get(name: string, opts?: GetCookieOptions): string | undefined {
     const sigId = opts?.signIdentifier || this.signIdentifier;
 
-    const sigName =  typeof sigId === 'function' ? sigId.call(null, name)
-      : `${name + '.'+ sigId}`;
+    const sigName = typeof sigId === 'function' ? sigId.call(null, name)
+      : `${name + '.' + sigId}`;
 
     const signed = opts && opts.signed !== undefined ? opts.signed : this.keyStore.signing.keys.length > 0;
 
@@ -109,7 +109,7 @@ export class Cookies {
       return encrypted ? this.keyStore.decrypt(value as string) : value;
     }
 
-    const remote = this.get(sigName, { encrypted: false, signed: false });
+    const remote = this.get(sigName, {encrypted: false, signed: false});
     if (!remote) {
       return undefined;
     }
@@ -118,10 +118,10 @@ export class Cookies {
     const index = this.keyStore.indexOf(data, remote);
 
     if (index < 0) {
-      this.set(sigName, null, { path: '/', signed: false });
+      this.set(sigName, null, {path: '/', signed: false});
       return undefined
     } else {
-      index && this.set(sigName, this.keyStore.sign(data), { signed: false });
+      index && this.set(sigName, this.keyStore.sign(data), {signed: false});
       return encrypted ? this.keyStore.decrypt(value as string) : value;
     }
   }
@@ -133,18 +133,15 @@ export class Cookies {
    * @param value Cookie value. If this is omitted, an outbound header with an expired date is used to delete the cookie.
    * @param opts Overridden options
    */
-  set(name: string, value: string | null, opts: SetCookies) {
-    const res = this.response;
-    const req = this.request;
+  set(name: string, value?: string | null, opts?: SetCookieOptions): Cookies {
+    const res = this.response,
+      req = this.request,
+      secure = this.secure !== undefined ? !!this.secure : (<any>req).protocol === 'https' || (<any>req).connection['encrypted'],
+      encrypted = opts && opts.encrypted !== undefined ? opts.encrypted : this.encrypted;
+
     let headers = (res.getHeader('Set-Cookie') || []) as string[];
-    const secure = this.secure !== undefined ? !!this.secure : (<any>req).protocol === 'https' || (<any>req).connection['encrypted'];
-    const encrypted = opts && opts.encrypted !== undefined ? opts.encrypted : this.encrypted;
 
-    if(value !== null && encrypted){
-      value = this.keyStore.encrypt(value as string);
-    }
-
-    const cookie = new Cookie(name, value, opts);
+    const cookie = new Cookie(name, encrypted ? this.keyStore.encrypt(value as string): value, opts);
     const signed = opts && opts.signed !== undefined ? opts.signed : this.signed;
 
     /* istanbul ignore next */
@@ -156,9 +153,7 @@ export class Cookies {
       throw new Error('Cannot send secure cookie over unencrypted connection');
     }
 
-    cookie.secure = opts && opts.secure !== undefined
-      ? opts.secure
-      : secure;
+    cookie.secure = opts && opts.secure !== undefined ? opts.secure : secure;
 
     pushCookie(headers, cookie);
 
@@ -167,8 +162,11 @@ export class Cookies {
 
       const sigId = opts.signIdentifier || this.signIdentifier;
 
-      cookie.name = typeof sigId === 'function' ? sigId.call(null, cookie.name)
-        : `${cookie.name + '.'+ sigId}`;
+      if (typeof sigId === 'function') {
+        cookie.name = sigId.call(null, cookie.name);
+      } else {
+        cookie.name = `${cookie.name + '.' + sigId}`;
+      }
       pushCookie(headers, cookie);
     }
 
@@ -179,13 +177,17 @@ export class Cookies {
 
   static middleware = (options?: CookiesOptions) => (req: any, res: any, next: any) => {
     req.cookies = res.cookies = new Cookies(req, res, options);
-
     next();
   }
+
   static connect = Cookies.middleware
   static express = Cookies.middleware
   static koa = (options?: CookiesOptions) => (ctx: any, next: any) => {
-    ctx.cookies = ctx.req.cookies = ctx.res.cookies = ctx.request.cookies = ctx.response.cookies = new Cookies(ctx.req, ctx.res, options)
+    ctx.cookies
+      = ctx.req.cookies
+      = ctx.res.cookies
+      = ctx.request.cookies
+      = ctx.response.cookies = new Cookies(ctx.req, ctx.res, options)
     next()
   }
 }

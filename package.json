@@ -87,7 +87,7 @@
           "refactor",
           "revert",
           "test",
-          "types"
+          "type"
         ]
       ],
       "header-max-length": [

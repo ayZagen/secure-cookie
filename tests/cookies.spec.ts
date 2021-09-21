@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import assert from "assert";
-import {Cookies, CookiesOptions, KeyStore, SetCookies} from "../src";
+import {Cookies, CookiesOptions, KeyStore, SetCookieOptions} from "../src";
 import fs from "fs";
 import http from "http";
 import https from "https";
@@ -797,7 +797,7 @@ function parseSetCookie(header: string) {
   return cookie
 }
 
-function setCookieHandler(name: string, value: string | null, options?: Partial<SetCookies>) {
+function setCookieHandler(name: string, value: string | null, options?: Partial<SetCookieOptions>) {
   return function (_req: any, res: any, cookies: Cookies) {
     cookies.set(name, value, options!)
     res.end()

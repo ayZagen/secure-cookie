@@ -5,6 +5,8 @@ import crypto, {BinaryToTextEncoding, CipherKey, Encoding} from "crypto";
 import {CIPHER_INFO} from "./ciphers";
 import type {Partial} from "rollup-plugin-typescript2/dist/partial";
 
+const AUTH_TAG_REQUIRED = /-(gcm|ccm)/
+
 export interface KeyStoreOpts {
   signing?: {
     keys: string[],
@@ -21,14 +23,12 @@ export interface KeyStoreOpts {
   }
 }
 
-type EncryptOptions = Required<KeyStoreOpts['encryption']> & { key?: string | undefined }
-type DecryptOptions = Required<KeyStoreOpts['encryption']> & {
+export type EncryptOptions = Required<KeyStoreOpts['encryption']> & { key?: string | undefined }
+export type DecryptOptions = Required<KeyStoreOpts['encryption']> & {
   key?: string | CipherKey | undefined,
   iv?: string | Buffer | undefined,
   authTag?: string | Buffer | undefined
 }
-
-const AUTH_TAG_REQUIRED = /-(gcm|ccm)/
 
 export class KeyStore {
   encryption: Required<NonNullable<KeyStoreOpts['encryption']>>;

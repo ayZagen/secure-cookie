@@ -11,8 +11,8 @@ secure-cookie
 ### Type aliases
 
 - [CookiesOptions](README.md#cookiesoptions)
-- [GetCookies](README.md#getcookies)
-- [SetCookies](README.md#setcookies)
+- [GetCookieOptions](README.md#getcookies)
+- [SetCookieOptions](README.md#setcookies)
 
 ## Type aliases
 
@@ -36,9 +36,9 @@ secure-cookie
 
 ___
 
-### GetCookies
+### GetCookieOptions
 
-Ƭ **GetCookies**: [`CookiesOptions`](README.md#cookiesoptions)
+Ƭ **GetCookieOptions**: [`CookiesOptions`](README.md#cookiesoptions)
 
 #### Defined in
 
@@ -46,9 +46,9 @@ ___
 
 ___
 
-### SetCookies
+### SetCookieOptions
 
-Ƭ **SetCookies**: [`CookiesOptions`](README.md#cookiesoptions) & `CookieAttrs`
+Ƭ **SetCookieOptions**: [`CookiesOptions`](README.md#cookiesoptions) & `CookieAttrs`
 
 #### Defined in
 

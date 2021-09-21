@@ -243,7 +243,7 @@ This sets the given cookie in the response and returns the current context to al
 | :------ | :------ | :------ |
 | `name` | `string` | Cookie name |
 | `value` | ``null`` \| `string` | Cookie value. If this is omitted, an outbound header with an expired date is used to delete the cookie. |
-| `opts` | [`SetCookies`](../README.md#setcookies) | Overridden options |
+| `opts` | [`SetCookieOptions`](../README.md#setcookies) | Overridden options |
 
 #### Returns
 

@@ -49,7 +49,7 @@ export class Cookie implements CookieAttrs {
   expires?: Date;
   maxAge?: number | null;
 
-  constructor(name: string, value: string | null, attrs?: CookieAttrs) {
+  constructor(name: string, value?: string | null, attrs?: CookieAttrs) {
     if (!fieldContentRegExp.test(name)) {
       throw new TypeError('argument name is invalid');
     }
