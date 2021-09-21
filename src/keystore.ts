@@ -3,7 +3,6 @@ import compare from 'tsscmp'
 
 import crypto, {BinaryToTextEncoding, CipherKey, Encoding} from "crypto";
 import {CIPHER_INFO} from "./ciphers";
-import type {Partial} from "rollup-plugin-typescript2/dist/partial";
 
 const AUTH_TAG_REQUIRED = /-(gcm|ccm)/
 
