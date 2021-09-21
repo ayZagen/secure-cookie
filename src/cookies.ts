@@ -187,8 +187,8 @@ export class Cookies {
       = ctx.req.cookies
       = ctx.res.cookies
       = ctx.request.cookies
-      = ctx.response.cookies = new Cookies(ctx.req, ctx.res, options)
-    next()
+      = ctx.response.cookies = new Cookies(ctx.req, ctx.res, options);
+    return next()
   }
 }
 
