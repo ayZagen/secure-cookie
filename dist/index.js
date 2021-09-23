@@ -1,5 +1,5 @@
 /*!
- * secure-cookie v0.0.7
+ * secure-cookie v0.1.0
  * (c) Ismail H. Ayaz
  * Released under the MIT License.
  */
@@ -167,22 +167,17 @@ var AUTH_TAG_REQUIRED = /-(gcm|ccm)/;
 var KeyStore = /** @class */ (function () {
     function KeyStore(opts) {
         opts = opts || {};
-        if (opts.encryption) {
-            if (!Array.isArray(opts.encryption.keys) || opts.encryption.keys.length === 0) {
-                throw new Error("keys are required for encryption");
-            }
-        }
-        if (opts.signing) {
-            if (!Array.isArray(opts.signing.keys) || opts.signing.keys.length === 0) {
-                throw new Error("keys are required for signing");
-            }
-        }
         this.encryption = Object.assign({
             algorithm: 'aes-192-ccm',
             authTagLength: 16,
-            encoding: 'hex', keys: []
+            encoding: 'hex',
+            keys: []
         }, opts.encryption || {});
-        this.signing = Object.assign({ encoding: 'base64', algorithm: 'sha1', keys: [] }, opts.signing || {});
+        this.signing = Object.assign({
+            encoding: 'base64',
+            algorithm: 'sha1',
+            keys: []
+        }, opts.signing || {});
     }
     KeyStore.prototype.encrypt = function (data, options) {
         if (!data) {

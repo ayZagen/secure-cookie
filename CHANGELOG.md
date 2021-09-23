@@ -1,3 +1,10 @@
+# [0.1.0](https://github.com/ayZagen/secure-cookie/compare/v0.0.7...v0.1.0) (2021-09-23)
+
+
+### Features
+
+* allow empty keystore constructor params ([1cfbf0a](https://github.com/ayZagen/secure-cookie/commit/1cfbf0a5ad5d85f4a81d290340cfc0efdb28beb8))
+
 ## [0.0.7](https://github.com/ayZagen/secure-cookie/compare/v0.0.6...v0.0.7) (2021-09-21)
 
 
