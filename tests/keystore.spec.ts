@@ -13,38 +13,6 @@ describe('[constructor]', () => {
     new KeyStore(null)
   })
 
-  it('should check encryption keys', () => {
-    expect(() => {
-      // @ts-expect-error
-      new KeyStore({encryption: {}})
-    }).toThrow(Error)
-
-    expect(() => {
-      new KeyStore({encryption: {keys: []}})
-    }).toThrow(Error)
-
-    expect(() => {
-      // @ts-expect-error
-      new KeyStore({encryption: {keys: {}}})
-    }).toThrow(Error)
-  })
-
-  it('should check signing keys', () => {
-    expect(() => {
-      // @ts-expect-error
-      new KeyStore({signing: {}})
-    }).toThrow(Error)
-
-    expect(() => {
-      new KeyStore({signing: {keys: []}})
-    }).toThrow(Error)
-
-    expect(() => {
-      // @ts-expect-error
-      new KeyStore({signing: {keys: {}}})
-    }).toThrow(Error)
-  })
-
   it('should assign encryption defaults', () => {
     const ks = new KeyStore({encryption: {keys: [genRandom()]}})
 
