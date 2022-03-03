@@ -26,7 +26,7 @@ yarn add secure-cookie
 ### Signed Cookies
 
 ```javascript
-const {Cookies, KeyStore} = require('secure-cookies')
+const {Cookies, KeyStore} = require('secure-cookie')
 
 const app = express()
 app.use(Cookies.express({
@@ -51,7 +51,7 @@ app.get('/some-route', function (req, res, next) {
 
 ### Encrypted Cookies
 ```javascript
-const {Cookies, KeyStore} = require('secure-cookies')
+const {Cookies, KeyStore} = require('secure-cookie')
 
 const app = express()
 
@@ -83,7 +83,7 @@ By default `aes-192-ccm` is selected. You can override that and related settings
 If the algorithm you would like to use is missing from the default ones you can add it by following:
 
 ```javascript
-const {KeyStore} = require('secure-cookies')
+const {KeyStore} = require('secure-cookie')
 KeyStore.cipherInfo['aes-xxx-xxx'] =  { ivLength: 16, keyLength: 16 }
 ```
 
